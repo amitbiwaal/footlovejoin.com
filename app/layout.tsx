@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
+import { SITE_NOINDEX } from "@/lib/site";
 
 const siteUrl = "https://footlovejoin.com";
 const gaId = "G-Z50LS4SRBF";
@@ -53,17 +54,19 @@ export const metadata: Metadata = {
       "Foot Love: Is it the best app to sell feet pics? We tested its features, fees, verification, earning potential, safety, pros, cons, and top alternatives.",
     images: ["/og-image.jpg"],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
-    },
-  },
+  robots: SITE_NOINDEX
+    ? { index: false, follow: false }
+    : {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+          "max-video-preview": -1,
+        },
+      },
   verification: {
     google: "rX49LvCRu4uRf23klIcdEuKSKWz1Yc_ulzkgYsV2jc8",
   },

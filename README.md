@@ -22,8 +22,13 @@ The Vercel project `footlovejoin` is connected to this GitHub repository:
 | `BLOB_READ_WRITE_TOKEN` | Blob store | Blog image uploads |
 | `ADMIN_USERNAME`, `ADMIN_PASSWORD` | you | Admin login |
 | `SESSION_SECRET` | you | Signs the admin session cookie |
+| `SITE_NOINDEX` | you | `1` = keep the whole site out of search engines (noindex) |
 
 Changing `ADMIN_PASSWORD` (then redeploying) signs everyone out.
+
+**Search visibility:** while `SITE_NOINDEX=1` is set, every page carries a
+`noindex` tag and header, so the site will not appear in Google. To make the site
+searchable, delete that variable (or set it to `0`) and redeploy.
 
 ---
 

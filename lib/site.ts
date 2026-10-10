@@ -15,6 +15,15 @@ export const SITE = {
   legalUpdated: "2026-10-10",
 } as const;
 
+/**
+ * Site-wide noindex switch: set SITE_NOINDEX=1 in the environment to keep every
+ * page out of search engines. It is read at build time, so redeploy after
+ * changing it. (next.config.mjs reads the same variable for the HTTP header.)
+ */
+export const SITE_NOINDEX = ["1", "true", "yes"].includes(
+  (process.env.SITE_NOINDEX ?? "").toLowerCase(),
+);
+
 export type NavLink = { label: string; href: string };
 
 export const MAIN_NAV: NavLink[] = [
