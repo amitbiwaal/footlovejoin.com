@@ -18,7 +18,7 @@ type Props = {
   onBack: () => void;
 };
 
-type Notice = { kind: "ok" | "error"; text: string };
+type Notice = { kind: "ok" | "error"; text: string; href?: string };
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -85,6 +85,12 @@ export default function PostEditor({
           body: JSON.stringify({ post: { ...post, status }, originalSlug: savedSlug }),
         });
         const data = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          // Keep the editor open so nothing is lost.
+          throw new Error(
+            "Your session expired. Open /admin/login/ in a new tab, sign in, then save again.",
+          );
+        }
         if (!res.ok) throw new Error(data.error || "Could not save the post.");
 
         const saved = data.post as Post;
@@ -93,13 +99,11 @@ export default function PostEditor({
         setSavedSlug(saved.slug);
         setAutoSlug(false);
         setDirty(false);
-        setNotice({
-          kind: "ok",
-          text:
-            saved.status === "published"
-              ? "Published. Run “npm run build” and upload the out/ folder to put it live."
-              : "Draft saved.",
-        });
+        setNotice(
+          saved.status === "published"
+            ? { kind: "ok", text: "Published — it is live now.", href: `/blog/${saved.slug}/` }
+            : { kind: "ok", text: "Draft saved." },
+        );
       } catch (error) {
         showError(error instanceof Error ? error.message : "Could not save the post.");
       } finally {
@@ -189,12 +193,12 @@ export default function PostEditor({
         <div className="ml-auto flex flex-wrap items-center gap-2">
           {savedSlug && (
             <a
-              href={`/blog/${savedSlug}/`}
+              href={published && !dirty ? `/blog/${savedSlug}/` : `/admin/preview/${savedSlug}/`}
               target="_blank"
               rel="noopener"
               className="btn-ghost px-4 py-2"
             >
-              Preview
+              {published && !dirty ? "View live" : "Preview"}
             </a>
           )}
           <button
@@ -226,6 +230,14 @@ export default function PostEditor({
           }`}
         >
           {notice.text}
+          {notice.href && (
+            <>
+              {" "}
+              <a href={notice.href} target="_blank" rel="noopener" className="underline underline-offset-2">
+                View post
+              </a>
+            </>
+          )}
         </p>
       )}
 

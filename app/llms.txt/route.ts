@@ -1,11 +1,13 @@
 import { getPublishedPosts } from "@/lib/posts";
 import { absoluteUrl } from "@/lib/site";
 
-export const dynamic = "force-static";
+// Cached, and refreshed at most once a minute. (In Next 14 revalidatePath does
+// not reach route handlers, so new posts show up here through this timer.)
+export const revalidate = 60;
 
 /** /llms.txt — a plain-language site summary for AI crawlers; lists every published post. */
-export function GET() {
-  const posts = getPublishedPosts();
+export async function GET() {
+  const posts = await getPublishedPosts();
 
   const blogLines = posts.length
     ? posts

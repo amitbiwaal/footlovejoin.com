@@ -1,36 +1,56 @@
 # FootLove — Website
 
-The #1 feet-selling website & app landing page. Built with **Next.js 14 (App Router)**,
-**TypeScript** and **Tailwind CSS**, exported as a **static site** (no database, no server) —
-perfect for hosting on Hostinger.
+Landing page, guide, blog and blog admin for footlovejoin.com. Built with
+**Next.js 14 (App Router)**, **TypeScript** and **Tailwind CSS**, hosted on **Vercel**.
+
+- Blog posts are stored in a **Turso** (SQLite) database.
+- Blog images are stored in **Vercel Blob**.
+- Pages are served as static HTML and rebuilt automatically when a post changes.
 
 ---
 
-## 🚀 Quick start
+## 🚀 Deploying
+
+The Vercel project `footlovejoin` is connected to this GitHub repository:
+**every push to `main` deploys to production.** There is nothing to upload by hand.
+
+### Environment variables (Vercel → Project → Settings → Environment Variables)
+
+| Variable | Set by | Purpose |
+| --- | --- | --- |
+| `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` | Turso integration | Blog database |
+| `BLOB_READ_WRITE_TOKEN` | Blob store | Blog image uploads |
+| `ADMIN_USERNAME`, `ADMIN_PASSWORD` | you | Admin login |
+| `SESSION_SECRET` | you | Signs the admin session cookie |
+
+Changing `ADMIN_PASSWORD` (then redeploying) signs everyone out.
+
+---
+
+## 📝 Writing blog posts
+
+1. Open **`/admin/`** on the live site and sign in.
+2. **+ New post** → write, add images, fill in the SEO box.
+3. **Publish** — the post is live within a few seconds. **Save draft** keeps it
+   private; **Preview** shows a draft exactly as visitors would see it.
+
+No deploy is needed for content. The blog page updates immediately; `sitemap.xml`,
+`feed.xml` (RSS) and `llms.txt` pick up changes within about a minute.
+
+---
+
+## 💻 Local development
 
 ```bash
-npm install       # install dependencies (first time only)
-npm run dev       # start local dev server → http://localhost:3000
-npm run build     # build the static site → generates the `out/` folder
+npm install
+npm run dev       # http://localhost:3000
 ```
 
-That's it. `npm run build` produces a plain HTML/CSS/JS site inside **`out/`**.
-
----
-
-## 🌐 Deploy to Hostinger
-
-1. Run `npm run build` — this creates the **`out/`** folder.
-2. Open Hostinger → **File Manager** (or FTP).
-3. Upload **everything inside `out/`** into your `public_html` folder.
-4. Visit your domain — done. ✅
-
-> Alternatively, use Hostinger's **"Node.js web app"** option and push from GitHub /
-> your IDE. For a pure landing page the static upload above is the simplest & cheapest.
-
-> ⚠️ **Adult content note:** confirm Hostinger's Terms of Service allow adult content
-> before going live. If not, the exact same `out/` files can be hosted on any
-> adult-friendly host or VPS — the code doesn't change.
+Create a `.env.local` with `ADMIN_USERNAME`, `ADMIN_PASSWORD` and `SESSION_SECRET` to
+use the admin locally. Without the `TURSO_*` and `BLOB_*` variables, local development
+uses a throwaway SQLite file (`.data/local.db`) and saves uploads to
+`public/images/blog/`, so it can never change the live site's content.
+(`vercel env pull` would point local development at the live database instead.)
 
 ---
 
@@ -46,37 +66,6 @@ Change those values and the whole site re-themes. The page background glow is in
 
 ---
 
-## 🖼️ Swap in real photos
-
-The gallery currently uses stylish "locked preview" tiles (no real images needed).
-To use real photos:
-
-1. Drop images into a **`public/images/`** folder.
-2. In `components/Gallery.tsx`, replace the gradient `<div>` inside `GalleryTile`
-   with an `<img src="/images/your-photo.jpg" />`.
-
----
-
-## 📝 Writing blog posts (local admin)
-
-The blog has its own editor. It runs **only on your computer** — it is not part of
-the live site, so there is no public login page to protect.
-
-1. `npm run dev`, then open **http://localhost:3000/admin/**
-2. **+ New post** → write, add images, fill in the SEO box → **Publish**
-   (or **Save draft** — drafts can be previewed locally but never go live).
-3. Stop the dev server (Ctrl+C), run `npm run build`, and upload `out/` as usual.
-
-Where things are stored:
-
-- Posts → `content/blog/<slug>.json` (one file per post)
-- Uploaded images → `public/images/blog/` (resized and compressed automatically)
-
-Publishing a post also updates `sitemap.xml`, `feed.xml` (RSS) and `llms.txt`
-automatically on the next build.
-
----
-
 ## 📁 Project structure
 
 ```
@@ -86,23 +75,26 @@ app/
   how-to-sell-feet-pics/  # the long-form guide
   blog/[[...slug]]/       # /blog/ and /blog/<slug>/
   about/ contact/ privacy-policy/ terms/ affiliate-disclosure/ 2257-compliance/
+  admin/                  # blog admin, login, draft preview
+  api/admin/              # login, posts and image-upload endpoints
   not-found.tsx           # custom 404
-  sitemap.ts robots.ts feed.xml/ llms.txt/   # generated at build time
-  admin/ api/admin/       # local blog admin (*.admin.tsx — dev only, never exported)
+  sitemap.ts robots.ts feed.xml/ llms.txt/
   globals.css             # base styles + design-system classes
 components/
   Header.tsx Footer.tsx   # nav (links come from lib/site.ts)
   Hero.tsx … Faq.tsx      # landing-page sections
   guide/                  # sections of the guide page
   blog/                   # blog index, post layout, post card
-  admin/                  # editor UI (TipTap)
+  admin/                  # editor UI (TipTap), login form
   PageShell.tsx           # layout for About / Contact / legal pages
   Icons.tsx               # inline SVG icons (no external library)
 lib/
   site.ts                 # site URL, contact email, nav + footer links
   seo.ts                  # per-page metadata + JSON-LD helpers
-  posts.ts post-html.ts   # blog storage + HTML rendering
-content/blog/             # blog posts (JSON)
+  db.ts posts.ts          # Turso connection + blog storage
+  auth.ts admin.ts        # admin sessions, login throttling
+  post-html.ts            # turns editor HTML into the rendered article
+middleware.ts             # keeps /admin and /api/admin behind the login
 tailwind.config.ts        # colors, gradient, animations
-next.config.mjs           # static export config
+next.config.mjs           # trailing slashes, noindex headers
 ```

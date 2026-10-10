@@ -42,8 +42,7 @@ function PostList({
         <div className="card mt-8 p-10 text-center">
           <p className="text-lg font-bold">No posts yet</p>
           <p className="mt-2 text-sm text-ink-muted">
-            Write your first article — it only goes live once you publish it
-            and rebuild the site.
+            Write your first article — it only goes live once you publish it.
           </p>
         </div>
       ) : (
@@ -81,15 +80,22 @@ function PostList({
 
       <div className="card mt-10 p-5 text-sm leading-relaxed text-ink-muted sm:p-6">
         <h2 className="font-bold text-ink">How publishing works</h2>
-        <ol className="mt-3 list-decimal space-y-1.5 pl-5">
-          <li>Write here and press <strong className="text-ink">Publish</strong> — the post is saved in <code className="text-rose-gold">content/blog/</code>.</li>
-          <li>Stop the dev server and run <code className="text-rose-gold">npm run build</code>.</li>
-          <li>Upload everything inside the <code className="text-rose-gold">out/</code> folder to your hosting.</li>
-        </ol>
-        <p className="mt-3 text-ink-faint">
-          This admin only exists on your computer (npm run dev). It is not part
-          of the live website.
-        </p>
+        <ul className="mt-3 list-disc space-y-1.5 pl-5">
+          <li>
+            <strong className="text-ink">Publish</strong> puts a post on the
+            live site within a few seconds — the blog page, sitemap and RSS
+            feed update on their own.
+          </li>
+          <li>
+            <strong className="text-ink">Save draft</strong> keeps it private.
+            Use <strong className="text-ink">Preview</strong> to see a draft as
+            visitors would.
+          </li>
+          <li>
+            <strong className="text-ink">Unpublish</strong> or delete takes a
+            post off the site straight away.
+          </li>
+        </ul>
       </div>
     </div>
   );
@@ -113,6 +119,8 @@ export default function AdminApp() {
 
     fetch("/api/admin/posts/")
       .then(async (res) => {
+        // Session expired while the tab was open.
+        if (res.status === 401) return window.location.assign("/admin/login/");
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || "Could not load posts.");
         setPosts(data.posts as Post[]);
@@ -147,6 +155,11 @@ export default function AdminApp() {
   );
 
   const isNew = open === NEW;
+  const logout = async () => {
+    await fetch("/api/admin/login/", { method: "DELETE" });
+    window.location.assign("/admin/login/");
+  };
+
   const editing = open && !isNew ? posts?.find((p) => p.slug === open) : undefined;
   const categories = Array.from(new Set(["Guides", ...(posts ?? []).map((p) => p.category)]));
 
@@ -166,9 +179,12 @@ export default function AdminApp() {
             <a href="/blog/" target="_blank" rel="noopener" className="hover:text-ink">
               View blog
             </a>
-            <a href="/" target="_blank" rel="noopener" className="hover:text-ink">
+            <a href="/" target="_blank" rel="noopener" className="hidden hover:text-ink sm:inline">
               View site
             </a>
+            <button type="button" onClick={logout} className="hover:text-ink">
+              Log out
+            </button>
           </nav>
         </div>
       </header>

@@ -27,3 +27,9 @@ next-env.d.ts
 
 # full-size originals of the gallery photos (optimized copies live in public/images)
 /image-originals/
+
+.vercel
+.env*
+
+# local SQLite database used by `npm run dev`
+/.data/

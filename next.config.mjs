@@ -1,34 +1,33 @@
-import { PHASE_DEVELOPMENT_SERVER } from "next/constants.js";
+const NOINDEX = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
 
-const BASE_EXTENSIONS = ["tsx", "ts", "jsx", "js"];
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Images are plain <img> tags (blog images are resized in the browser
+  // before upload), so the image optimizer is not used.
+  images: {
+    unoptimized: true,
+  },
 
-/** @type {(phase: string) => import('next').NextConfig} */
-const nextConfig = (phase) => {
-  const isDev = phase === PHASE_DEVELOPMENT_SERVER;
+  // Cleaner URLs: /faq/ instead of /faq.html
+  trailingSlash: true,
 
-  return {
-    // Static export -> generates an `out/` folder of plain HTML/CSS/JS.
-    // Perfect for hosting on Hostinger (upload `out/` to public_html),
-    // or Netlify/Cloudflare Pages. No Node server required.
-    //
-    // `npm run dev` keeps a real server instead, because the local blog admin
-    // (/admin/) needs API routes that write posts into `content/blog/`.
-    output: isDev ? undefined : "export",
-
-    // Static export can't optimize images on a server, so serve them as-is.
-    images: {
-      unoptimized: true,
-    },
-
-    // Cleaner URLs: /faq/ instead of /faq.html
-    trailingSlash: true,
-
-    // Files named `page.admin.tsx` / `route.admin.ts` are routes only in dev,
-    // so the blog admin and its write APIs never ship in the `out/` folder.
-    pageExtensions: isDev
-      ? ["admin.tsx", "admin.ts", ...BASE_EXTENSIONS]
-      : BASE_EXTENSIONS,
-  };
+  async headers() {
+    return [
+      // The *.vercel.app copy of the site must not compete with the real
+      // domain in search results.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: ".*\\.vercel\\.app" }],
+        headers: NOINDEX,
+      },
+      // The admin is private, and must not be embeddable in another page.
+      {
+        source: "/admin/:path*",
+        headers: [...NOINDEX, { key: "X-Frame-Options", value: "DENY" }],
+      },
+      { source: "/api/:path*", headers: NOINDEX },
+    ];
+  },
 };
 
 export default nextConfig;

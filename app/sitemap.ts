@@ -2,7 +2,9 @@ import type { MetadataRoute } from "next";
 import { getPublishedPosts } from "@/lib/posts";
 import { SITE, absoluteUrl } from "@/lib/site";
 
-export const dynamic = "force-static";
+// Cached, and refreshed at most once a minute. (In Next 14 revalidatePath does
+// not reach route handlers, so new posts show up here through this timer.)
+export const revalidate = 60;
 
 // [path, last meaningful content change, changeFrequency, priority]
 const STATIC_PAGES: [string, string, "daily" | "weekly" | "monthly" | "yearly", number][] = [
@@ -16,8 +18,8 @@ const STATIC_PAGES: [string, string, "daily" | "weekly" | "monthly" | "yearly", 
   ["/2257-compliance/", SITE.legalUpdated, "yearly", 0.3],
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const posts = getPublishedPosts();
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const posts = await getPublishedPosts();
   const postDate = (p: (typeof posts)[number]) => p.updatedAt || p.publishedAt;
   const newestPost = posts.map(postDate).sort().pop();
 

@@ -21,8 +21,8 @@ const page = blogIndexPage;
 const crumbs = [{ name: "Blog", path: page.path }];
 
 /** The /blog/ listing: newest post featured, the rest as cards. */
-export default function BlogIndex() {
-  const posts = getPublishedPosts();
+export default async function BlogIndex() {
+  const posts = await getPublishedPosts();
   const [featured, ...rest] = posts;
   const pageUrl = absoluteUrl(page.path);
 

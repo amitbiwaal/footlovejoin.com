@@ -15,7 +15,14 @@ import { breadcrumbLd, faqLd } from "@/lib/seo";
 import { SITE, absoluteUrl, formatDate } from "@/lib/site";
 
 /** One article: header, cover, table of contents, body, FAQ, related posts. */
-export default function BlogPost({ post }: { post: Post }) {
+export default async function BlogPost({
+  post,
+  preview = false,
+}: {
+  post: Post;
+  /** Rendered from /admin/preview/ — may be an unpublished draft. */
+  preview?: boolean;
+}) {
   const { html, toc, wordCount, readingMinutes } = renderPostHtml(post.content);
   const path = `/blog/${post.slug}/`;
   const url = absoluteUrl(path);
@@ -24,7 +31,7 @@ export default function BlogPost({ post }: { post: Post }) {
     { name: post.title, path },
   ];
 
-  const others = getPublishedPosts().filter((p) => p.slug !== post.slug);
+  const others = (await getPublishedPosts()).filter((p) => p.slug !== post.slug);
   const related = [
     ...others.filter((p) => p.category === post.category),
     ...others.filter((p) => p.category !== post.category),
@@ -56,10 +63,11 @@ export default function BlogPost({ post }: { post: Post }) {
     <>
       <Header />
       <main>
-        {post.status !== "published" && (
-          <div className="border-b border-coral/30 bg-coral/10 py-2.5 text-center text-sm font-semibold text-rose-gold">
-            Draft preview — this post is not published and won&apos;t appear on
-            the live site.
+        {preview && (
+          <div className="border-b border-coral/30 bg-coral/10 px-5 py-2.5 text-center text-sm font-semibold text-rose-gold">
+            {post.status === "published"
+              ? "Preview — showing your last saved version."
+              : "Draft preview — this post is not published, so visitors can’t see it."}
           </div>
         )}
 

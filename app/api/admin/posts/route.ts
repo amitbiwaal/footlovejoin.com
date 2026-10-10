@@ -1,20 +1,19 @@
-// Dev-only (see `pageExtensions` in next.config.mjs): the blog admin's post API.
-import { adminGuard } from "@/lib/admin-guard";
+import { requireAdmin, revalidateBlog } from "@/lib/admin";
 import { PostError, deletePost, getAllPosts, savePost } from "@/lib/posts";
 
 export const dynamic = "force-dynamic";
 
 /** All posts, drafts included. */
-export function GET(request: Request) {
-  const denied = adminGuard(request);
+export async function GET(request: Request) {
+  const denied = await requireAdmin(request);
   if (denied) return denied;
 
-  return Response.json({ posts: getAllPosts() });
+  return Response.json({ posts: await getAllPosts() });
 }
 
 /** Create or update: `{ post, originalSlug? }`. */
 export async function POST(request: Request) {
-  const denied = adminGuard(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
 
   let body: { post?: unknown; originalSlug?: unknown };
@@ -25,10 +24,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const post = savePost(
+    const post = await savePost(
       body.post,
       typeof body.originalSlug === "string" ? body.originalSlug : undefined,
     );
+    revalidateBlog();
     return Response.json({ post });
   } catch (error) {
     if (error instanceof PostError) {
@@ -39,12 +39,15 @@ export async function POST(request: Request) {
 }
 
 /** Delete: `?slug=my-post`. */
-export function DELETE(request: Request) {
-  const denied = adminGuard(request);
+export async function DELETE(request: Request) {
+  const denied = await requireAdmin(request);
   if (denied) return denied;
 
   const slug = new URL(request.url).searchParams.get("slug") ?? "";
-  return deletePost(slug)
-    ? Response.json({ ok: true })
-    : Response.json({ error: "Post not found." }, { status: 404 });
+  if (!(await deletePost(slug))) {
+    return Response.json({ error: "Post not found." }, { status: 404 });
+  }
+
+  revalidateBlog();
+  return Response.json({ ok: true });
 }

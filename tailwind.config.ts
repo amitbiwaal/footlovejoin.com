@@ -1,13 +1,9 @@
 import type { Config } from "tailwindcss";
 
-const isProd = process.env.NODE_ENV === "production";
-
 const config: Config = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    // The blog admin only exists in `npm run dev`; keep its classes out of the live CSS.
-    ...(isProd ? ["!./components/admin/**", "!./app/admin/**"] : []),
   ],
   theme: {
     extend: {

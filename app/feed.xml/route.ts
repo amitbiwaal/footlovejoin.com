@@ -1,7 +1,9 @@
 import { getPublishedPosts } from "@/lib/posts";
 import { SITE, absoluteUrl } from "@/lib/site";
 
-export const dynamic = "force-static";
+// Cached, and refreshed at most once a minute. (In Next 14 revalidatePath does
+// not reach route handlers, so new posts show up here through this timer.)
+export const revalidate = 60;
 
 const esc = (s: string) =>
   s
@@ -11,8 +13,8 @@ const esc = (s: string) =>
     .replace(/"/g, "&quot;");
 
 /** RSS 2.0 feed of the published blog posts -> /feed.xml */
-export function GET() {
-  const posts = getPublishedPosts();
+export async function GET() {
+  const posts = await getPublishedPosts();
 
   const items = posts
     .map((p) => {

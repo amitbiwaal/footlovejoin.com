@@ -2,32 +2,35 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import BlogIndex, { blogIndexPage } from "@/components/blog/BlogIndex";
 import BlogPost from "@/components/blog/BlogPost";
-import { getAllPosts, getPost, getPublishedPosts } from "@/lib/posts";
+import { getPost, getPublishedPosts } from "@/lib/posts";
 import { buildMetadata } from "@/lib/seo";
 
-// One route for both /blog/ and /blog/<slug>/. Static export refuses a dynamic
-// route with zero params, so a separate [slug] route would break the build
-// whenever no post is published; here the index is always one of the params.
+// One route for both /blog/ and /blog/<slug>/.
 type Props = { params: { slug?: string[] } };
 
-const isDev = process.env.NODE_ENV === "development";
+// Pages are served as static HTML. The admin rebuilds them the moment a post
+// changes (revalidateBlog); the hourly refresh is only a safety net.
+export const revalidate = 3600;
 
-// Drafts are previewable in `npm run dev`, but never exported to the live site.
-const visiblePosts = () => (isDev ? getAllPosts() : getPublishedPosts());
+// A post published after the last deploy is rendered on its first visit.
+export const dynamicParams = true;
 
-const postFor = ({ slug }: Props["params"]) =>
-  slug?.length === 1 ? getPost(slug[0]) : null;
-
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return [{ slug: [] }, ...visiblePosts().map((p) => ({ slug: [p.slug] }))];
+export async function generateStaticParams() {
+  const posts = await getPublishedPosts();
+  return [{ slug: [] }, ...posts.map((p) => ({ slug: [p.slug] }))];
 }
 
-export function generateMetadata({ params }: Props): Metadata {
+/** The published post for this URL, or null. Drafts are never public. */
+async function postFor({ slug }: Props["params"]) {
+  if (slug?.length !== 1) return null;
+  const post = await getPost(slug[0]);
+  return post?.status === "published" ? post : null;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!params.slug?.length) return buildMetadata(blogIndexPage);
 
-  const post = postFor(params);
+  const post = await postFor(params);
   if (!post) return {};
 
   return buildMetadata({
@@ -41,15 +44,14 @@ export function generateMetadata({ params }: Props): Metadata {
     publishedTime: post.publishedAt || undefined,
     modifiedTime: post.updatedAt || post.publishedAt || undefined,
     authors: [post.author],
-    noindex: post.status !== "published",
   });
 }
 
-export default function BlogRoute({ params }: Props) {
+export default async function BlogRoute({ params }: Props) {
   if (!params.slug?.length) return <BlogIndex />;
 
-  const post = postFor(params);
-  if (!post || (!isDev && post.status !== "published")) notFound();
+  const post = await postFor(params);
+  if (!post) notFound();
 
   return <BlogPost post={post} />;
 }
