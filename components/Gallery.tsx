@@ -45,9 +45,9 @@ function GalleryTile({ t }: { t: Tile }) {
       </div>
 
       {/* seller footer */}
-      <div className="absolute inset-x-0 bottom-0 flex items-center gap-3 p-4">
+      <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 p-3 sm:gap-3 sm:p-4">
         <span
-          className="h-9 w-9 shrink-0 rounded-full border-2 border-white/70"
+          className="h-8 w-8 shrink-0 rounded-full border-2 border-white/70 sm:h-9 sm:w-9"
           style={{ background: "linear-gradient(135deg,#FF6B5A,#241F30)" }}
         />
         <div className="min-w-0 flex-1">
@@ -61,7 +61,7 @@ function GalleryTile({ t }: { t: Tile }) {
           </p>
           <p className="truncate text-xs text-white/70">{t.handle}</p>
         </div>
-        <button className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-[#1a0d0a] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <button className="hidden rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-[#1a0d0a] opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:block">
           Unlock
         </button>
       </div>

@@ -50,9 +50,11 @@ export default function GuideEarnings() {
 
         {/* price table */}
         <div className="mt-12 overflow-hidden rounded-3xl border border-white/10 bg-bg-card/60">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[620px] text-left text-sm">
-              <thead>
+          {/* On phones each row stacks (type + price, then the note) so no
+              column is hidden off-screen; from sm up it is a regular table. */}
+          <div>
+            <table className="block w-full text-left text-sm sm:table">
+              <thead className="hidden sm:table-header-group">
                 <tr className="border-b border-white/10 bg-bg/60">
                   <th className="px-5 py-4 font-bold text-rose-gold">
                     Content type
@@ -65,17 +67,21 @@ export default function GuideEarnings() {
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="block sm:table-row-group">
                 {ROWS.map(([type, range, driver]) => (
                   <tr
                     key={type}
-                    className="border-b border-white/5 transition-colors last:border-0 hover:bg-white/5"
+                    className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-white/5 px-5 py-4 transition-colors last:border-0 hover:bg-white/5 sm:table-row sm:p-0"
                   >
-                    <td className="px-5 py-4 text-ink-muted">{type}</td>
-                    <td className="whitespace-nowrap px-5 py-4 font-bold text-coral">
+                    <td className="font-semibold text-ink sm:px-5 sm:py-4 sm:font-normal sm:text-ink-muted">
+                      {type}
+                    </td>
+                    <td className="whitespace-nowrap font-bold text-coral sm:px-5 sm:py-4">
                       {range}
                     </td>
-                    <td className="px-5 py-4 text-ink-muted">{driver}</td>
+                    <td className="w-full text-ink-muted sm:w-auto sm:px-5 sm:py-4">
+                      {driver}
+                    </td>
                   </tr>
                 ))}
               </tbody>

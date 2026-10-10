@@ -78,14 +78,16 @@ export default function SocialProof() {
             Here&apos;s why creators trust Foot Love to sell feet pictures online
             and get paid.
           </p>
-          <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2">
+          <div className="mt-5 inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-3xl border border-white/10 bg-white/5 px-4 py-2 sm:rounded-full">
             <span className="flex items-center gap-1 text-rose-gold">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star key={i} className="h-4 w-4" />
               ))}
             </span>
-            <span className="text-sm font-semibold">Rated Excellent</span>
-            <span className="text-sm text-ink-faint">· 3,100+ reviews</span>
+            <span className="whitespace-nowrap text-sm font-semibold">Rated Excellent</span>
+            <span className="whitespace-nowrap text-sm text-ink-faint">
+              <span className="hidden sm:inline">· </span>3,100+ reviews
+            </span>
           </div>
         </div>
 

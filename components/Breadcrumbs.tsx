@@ -24,7 +24,7 @@ export default function Breadcrumbs({
                   {c.name}
                 </span>
               ) : (
-                <Link href={c.path} className="transition-colors hover:text-ink">
+                <Link href={c.path} className="inline-block py-1.5 transition-colors hover:text-ink">
                   {c.name}
                 </Link>
               )}

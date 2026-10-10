@@ -221,7 +221,7 @@ export default async function BlogPost({
                 </h2>
                 <Link
                   href="/blog/"
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-coral-soft hover:text-coral"
+                  className="inline-flex items-center gap-1.5 py-2 text-sm font-semibold text-coral-soft hover:text-coral"
                 >
                   All articles
                   <ArrowRight className="h-4 w-4" />

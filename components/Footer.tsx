@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LEGAL_NAV, MAIN_NAV } from "@/lib/site";
 
-const linkClass = "text-ink-muted transition-colors hover:text-ink";
+const linkClass = "inline-block py-1.5 text-ink-muted transition-colors hover:text-ink";
 const inlineLinkClass = "underline underline-offset-2 transition-colors hover:text-ink";
 
 export default function Footer() {
@@ -11,9 +11,9 @@ export default function Footer() {
         {/* Site + legal links */}
         <nav
           aria-label="Footer"
-          className="mx-auto mb-10 max-w-3xl space-y-4 border-b border-white/10 pb-10 text-sm"
+          className="mx-auto mb-10 max-w-3xl space-y-1 border-b border-white/10 pb-10 text-sm"
         >
-          <ul className="flex flex-wrap justify-center gap-x-6 gap-y-3 font-medium">
+          <ul className="flex flex-wrap justify-center gap-x-6 font-medium">
             {MAIN_NAV.map((n) => (
               <li key={n.href}>
                 <Link href={n.href} className={linkClass}>
@@ -22,7 +22,7 @@ export default function Footer() {
               </li>
             ))}
           </ul>
-          <ul className="flex flex-wrap justify-center gap-x-6 gap-y-3">
+          <ul className="flex flex-wrap justify-center gap-x-6">
             {LEGAL_NAV.map((n) => (
               <li key={n.href}>
                 <Link href={n.href} className={linkClass}>

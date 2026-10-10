@@ -4,21 +4,25 @@ const COUNTRIES = [
   {
     flag: "🇺🇸",
     code: "US",
+    name: "United States",
     text: "Legal at 18+. Treat earnings as self-employment income (often Schedule C) and set money aside for tax.",
   },
   {
     flag: "🇬🇧",
     code: "GB",
+    name: "United Kingdom",
     text: "Legal at 18+. Declare to HMRC as self-employed once you pass the trading allowance.",
   },
   {
     flag: "🇦🇺",
     code: "AU",
+    name: "Australia",
     text: "Legal at 18+. Report to the ATO; an ABN can help if you run it as a business.",
   },
   {
     flag: "🇨🇦",
     code: "CA",
+    name: "Canada",
     text: "Legal at 18+. Report as self-employment/business income and hold on to expense records.",
   },
 ];
@@ -53,7 +57,7 @@ export default function GuideCountries() {
                 <span className="text-2xl leading-none" aria-hidden>
                   {c.flag}
                 </span>
-                {c.code}
+                {c.name}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-ink-muted">
                 {c.text}
