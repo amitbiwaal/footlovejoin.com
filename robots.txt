@@ -1,0 +1,8 @@
+# robots.txt for https://footlovejoin.com
+# Foot Love — adults-only (18+) feet-content marketplace
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://footlovejoin.com/sitemap.xml

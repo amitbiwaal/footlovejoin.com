@@ -1,0 +1,16 @@
+/* Admin rich-text editor (TipTap) */
+.ProseMirror {
+  min-height: 24rem;
+  outline: none;
+}
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: #6f6879;
+}
+.ProseMirror img.ProseMirror-selectednode {
+  outline: 2px solid #ff6b5a;
+  outline-offset: 2px;
+}

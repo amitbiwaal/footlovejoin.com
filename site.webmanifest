@@ -1,0 +1,15 @@
+{
+  "name": "Foot Love — Sell Feet Pics Online",
+  "short_name": "Foot Love",
+  "description": "The safe, anonymous way to sell feet pics and videos online to verified buyers.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0E0D12",
+  "theme_color": "#0E0D12",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any" },
+    { "src": "/android-chrome-192x192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/android-chrome-512x512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}
